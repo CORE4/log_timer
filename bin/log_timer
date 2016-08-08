@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+
+require 'log_timer'
+require 'optparse'
+require 'active_support/core_ext/hash/keys'
+require 'yaml'
+
+cmd_options = {
+  config: "#{ENV['HOME']}/.log_timer.yml",
+  quiet: false,
+  mail: false,
+  write_config: false
+}
+
+DEFAULT_CONFIG = {
+  mail: {
+    smtp_server: 'example.com',
+    smtp_port: 25,
+    smtp_user: 'exmapleuser',
+    smtp_password: 'examplepassword'
+  },
+  files: {
+    old: {
+      path: '/path/to/some.log',
+      limit: '24h'
+    },
+    new: {
+      path: '/some/other.log',
+      limit: '60d'
+    }
+  }
+}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: log_timer [options]\nDefault config file: #{cmd_options[:config]}"
+
+  opts.on('-q', '--quiet', 'Do not output anything. (when using with cron, see --mail)') do
+    cmd_options[:quiet] = true
+  end
+
+  opts.on('-c [CONFIG]', '--config [CONFIG]', 'Path to the config file') do |config|
+    cmd_options[:config] = config
+  end
+
+  opts.on('-m', '--mail', 'Send mail when an old file is found') do
+    cmd_options[:mail] = true
+  end
+
+  opts.on('--init', 'Write a new config file with default values') do
+    cmd_options[:write_config] = true
+  end
+end
+optparse.parse!
+
+if cmd_options[:write_config]
+  File.rename cmd_options[:config], "#{cmd_options[:config]}.bkp" if File.exist? cmd_options[:config]
+
+  File.open(cmd_options[:config], 'w') do |file|
+    file.write(DEFAULT_CONFIG.deep_stringify_keys.to_yaml)
+  end
+  puts "Config written into '#{cmd_options[:config]}'." unless cmd_options[:quiet]
+  exit 0
+end
+
+unless File.exist? cmd_options[:config]
+  STDERR.puts "Cannot find config file (#{cmd_options[:config]})"
+  exit 1
+end
+
+config = YAML.load_file(cmd_options[:config]).deep_symbolize_keys
+
+config[:cmd_options] = cmd_options
+
+LogTimer::LogTimer.new(config).check
