@@ -10,7 +10,22 @@ than the given limit.
 
 ## Usage
 
-TODO: Write usage instructions here
+When you run the gem for the first time, use the `--init` parameter to generate a basic example config.
+Then open ~/.log_timer.yml in your favorite editor (most likely vim) and add the (log) files you want to have checked.
+
+When you run log_timer, it will check all files listed in the "files:" section and check their modification times.
+If a file is older than the specified limit, it will warn you with a message. This is not yet as useful as I would want
+to have it. So if you run `log_timer --mail` it will send a mail to you with the same info plus the last lines from
+the file (either 10 or, if specified, the number given with "tail:").
+
+A cronjob might look like this:
+
+```crontab
+0 * * * * log_timer --mail --quiet
+```
+
+The limit works with [chronic_duration](https://github.com/hpoydar/chronic_duration). Most likely you will need
+something like "30d" for 30 days or 24 hours ("24h").
 
 ## Development
 

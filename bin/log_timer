@@ -13,16 +13,20 @@ cmd_options = {
 }
 
 DEFAULT_CONFIG = {
+  hostname: `hostname`,
   mail: {
     smtp_server: 'example.com',
     smtp_port: 25,
     smtp_user: 'exmapleuser',
-    smtp_password: 'examplepassword'
+    smtp_password: 'examplepassword',
+    from: 'logtimer@example.com',
+    to: 'youraddress@example.com'
   },
   files: {
     old: {
       path: '/path/to/some.log',
-      limit: '24h'
+      limit: '24h',
+      tail: 10
     },
     new: {
       path: '/some/other.log',
