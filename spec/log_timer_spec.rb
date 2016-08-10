@@ -2,6 +2,10 @@ require 'spec_helper'
 require_relative 'fake_mailer'
 
 TEST_CONFIG = {
+  cmd_options: {
+    mail: true,
+    quiet: true
+  },
   mail: {
     smtp_server: 'example.com',
     smtp_port: 25,
@@ -13,11 +17,11 @@ TEST_CONFIG = {
   files: {
     old: {
       path: LOG_FILE_OLD,
-      limit: Time.now - 24 * 60 * 60
+      limit: '24h'
     },
     new: {
       path: LOG_FILE_NEW,
-      limit: Time.now - 24 * 60 * 60
+      limit: '24h'
     }
   }
 }
