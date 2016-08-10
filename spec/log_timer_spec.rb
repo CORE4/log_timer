@@ -1,6 +1,5 @@
 require 'spec_helper'
 require_relative 'fake_mailer'
-require 'activesupport'
 
 TEST_CONFIG = {
   mail: {
